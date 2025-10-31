@@ -1,0 +1,477 @@
+{
+	"info": {
+		"_postman_id": "7cbb8201-8118-44fe-bd08-0e4e270d235e",
+		"name": "EMS Machine Test",
+		"description": "Django REST API project for Employee Management System includes JWT authentication, Employee CRUD, and Dynamic Form Builder.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49673459"
+	},
+	"item": [
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"adarsh2\",\r\n    \"password\": \"Adarsh@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/login/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Getprofile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODg1Nzk0LCJpYXQiOjE3NjE4ODM5OTQsImp0aSI6ImJiMzlmZDE0ZGNmNDRlZjlhNTQyMTExMjVkNmY0MDcyIiwidXNlcl9pZCI6IjIifQ.jOEHLfzbvuXGaKPTnp3l8V7gRHJL17MigPOcTY4buLo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/profile/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"profile",
+								""
+							]
+						},
+						"description": "This endpoint returns the authenticated user’s profile details.\r\nRequires a valid Bearer token in the Authorization header"
+					},
+					"response": []
+				},
+				{
+					"name": "Token Refresh",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2MTk4MDcwMCwiaWF0IjoxNzYxODk0MzAwLCJqdGkiOiJhZWZkYTYwMzI3MTg0OTUyYWQ2OTY4Y2VlZDVkYmE1ZiIsInVzZXJfaWQiOiIyIn0.luV8o81rR152jQ35SVU1sV6vF3cLMyFP-9gggXf2OnY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/token/refresh/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employees",
+			"item": [
+				{
+					"name": "Create Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODg4MTg5LCJpYXQiOjE3NjE4ODYzODksImp0aSI6IjBmNzkxNjU2YzE4NjRiZWY4ZWUzZGUzYzA1ZDg0Y2U5IiwidXNlcl9pZCI6IjIifQ.1mEumbB2C79J_eKsY0qo_XvzKaQDMxtcGZjELPMyJYk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODg4MTg5LCJpYXQiOjE3NjE4ODYzODksImp0aSI6IjBmNzkxNjU2YzE4NjRiZWY4ZWUzZGUzYzA1ZDg0Y2U5IiwidXNlcl9pZCI6IjIifQ.1mEumbB2C79J_eKsY0qo_XvzKaQDMxtcGZjELPMyJYk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"data\": {\r\n        \"name\": \"Adarsh MK\",\r\n        \"email\": \"adarsh@example.com\",\r\n        \"phone\": \"9876543210\",\r\n        \"department\": \"Development\",\r\n        \"designation\": \"Python Developer\"\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/employees/employees/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"employees",
+								"employees",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Employees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/employees/employees/?Authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODg1Nzk0LCJpYXQiOjE3NjE4ODM5OTQsImp0aSI6ImJiMzlmZDE0ZGNmNDRlZjlhNTQyMTExMjVkNmY0MDcyIiwidXNlcl9pZCI6IjIifQ.jOEHLfzbvuXGaKPTnp3l8V7gRHJL17MigPOcTY4buLo",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"employees",
+								"employees",
+								""
+							],
+							"query": [
+								{
+									"key": "Authorization",
+									"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODg1Nzk0LCJpYXQiOjE3NjE4ODM5OTQsImp0aSI6ImJiMzlmZDE0ZGNmNDRlZjlhNTQyMTExMjVkNmY0MDcyIiwidXNlcl9pZCI6IjIifQ.jOEHLfzbvuXGaKPTnp3l8V7gRHJL17MigPOcTY4buLo"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"name\": \"Adarsh M.K\",\r\n    \"email\": \"adarsh@example.com\",\r\n    \"phone\": \"9876543210\",\r\n    \"department\": \"R&D\",\r\n    \"designation\": \"Senior Python Developer\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/employees/employees/1/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"employees",
+								"employees",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/employees/employees/1/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"employees",
+								"employees",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dynamic Form",
+			"item": [
+				{
+					"name": "Create Dynamic Form",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Employee Information Form\",\r\n  \"slug\": \"employee-information-form\",\r\n  \"fields\": [\r\n    {\r\n      \"name\": \"full_name\",\r\n      \"label\": \"Full Name\",\r\n      \"field_type\": \"text\",\r\n      \"required\": true\r\n    },\r\n    {\r\n      \"name\": \"email\",\r\n      \"label\": \"Email Address\",\r\n      \"field_type\": \"email\",\r\n      \"required\": true\r\n    },\r\n    {\r\n      \"name\": \"phone\",\r\n      \"label\": \"Phone Number\",\r\n      \"field_type\": \"number\",\r\n      \"required\": false\r\n    },\r\n    {\r\n      \"name\": \"department\",\r\n      \"label\": \"Department\",\r\n      \"field_type\": \"text\",\r\n      \"required\": true\r\n    },\r\n    {\r\n      \"name\": \"joining_date\",\r\n      \"label\": \"Joining Date\",\r\n      \"field_type\": \"date\",\r\n      \"required\": false\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/forms/forms/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								"forms",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all froms",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/forms/forms/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								"forms",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get single from details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzYxODkzOTg2LCJpYXQiOjE3NjE4OTIxODYsImp0aSI6ImEwMGRiMWJjZWE5ZTQzYTJiYTExZTI4ZTJmYTA1MzdlIiwidXNlcl9pZCI6IjIifQ.EDsTg1exbrX_pmUWqANoMPuxyr2-HC6E-HAWAqc7QhI",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/forms/forms/1/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								"forms",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
