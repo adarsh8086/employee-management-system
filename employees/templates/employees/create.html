@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <title>Create Employee</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h2>Create Employee</h2>
+  <select id="formSelect"></select>
+  <form id="employeeForm"></form>
+  <button id="submitBtn">Create</button>
+
+<script>
+const token = localStorage.getItem('access');
+
+async function loadForms(){
+  const res = await axios.get('/api/forms/', { headers: { Authorization: `Bearer ${token}` } });
+  const select = document.getElementById('formSelect');
+  res.data.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.id; opt.textContent = f.name;
+    select.appendChild(opt);
+  });
+  if(res.data.length) {
+    renderForm(res.data[0]);
+  }
+}
+
+document.getElementById('formSelect').addEventListener('change', async (e) => {
+  const id = e.target.value;
+  const res = await axios.get(`/api/forms/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
+  renderForm(res.data);
+});
+
+function renderForm(formObj){
+  const formEl = document.getElementById('employeeForm');
+  formEl.innerHTML = ''; // clear
+  formEl.setAttribute('data-form-id', formObj.id);
+  formObj.fields.forEach(f => {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `<label>${f.label}${f.required ? '*' : ''}</label>`;
+    let input;
+    if(f.field_type === 'textarea') {
+      input = document.createElement('textarea');
+      input.name = f.name;
+    } else {
+      input = document.createElement('input');
+      input.type = f.field_type === 'text' ? 'text' : f.field_type;
+      input.name = f.name;
+    }
+    if(f.required) input.required = true;
+    wrapper.appendChild(input);
+    formEl.appendChild(wrapper);
+  });
+}
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const formEl = document.getElementById('employeeForm');
+  const formId = formEl.getAttribute('data-form-id');
+  const data = {};
+  new FormData(formEl).forEach((v, k) => data[k] = v);
+  try {
+    await axios.post('/api/employees/', { form_id: formId, data }, { headers: { Authorization: `Bearer ${token}` } });
+    alert('Employee created');
+    // optionally redirect to list
+  } catch (err) {
+    console.error(err);
+    alert('Error: ' + (err.response?.data || err.message));
+  }
+});
+
+loadForms();
+</script>
+</body>
+</html>

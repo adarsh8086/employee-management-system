@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <title>Employees</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h2>Employees</h2>
+  <input id="q" placeholder="Search (searches values)">
+  <button id="searchBtn">Search</button>
+
+  <table border="1" id="tbl">
+    <thead><tr><th>ID</th><th>Name</th><th>Form</th><th>Actions</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+<script>
+const token = localStorage.getItem('access');
+
+async function load(q=''){
+  const params = {};
+  if(q) params.q = q;
+  const res = await axios.get('/api/employees/', { headers: { Authorization: `Bearer ${token}` }, params });
+  const tbody = document.querySelector('#tbl tbody');
+  tbody.innerHTML = '';
+  res.data.forEach(e => {
+    const tr = document.createElement('tr');
+    const name = e.data.name || e.data.full_name || '—';
+    tr.innerHTML = `<td>${e.id}</td><td>${name}</td><td>${e.form?.name || ''}</td>
+    <td>
+      <button onclick="deleteEmployee(${e.id})">Delete</button>
+      <button onclick='viewJson(${JSON.stringify(e.data)})'>View</button>
+    </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('searchBtn').addEventListener('click', () => {
+  const q = document.getElementById('q').value;
+  load(q);
+});
+
+async function deleteEmployee(id) {
+  if(!confirm('Delete?')) return;
+  await axios.delete(`/api/employees/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
+  load();
+}
+
+function viewJson(data){
+  alert(JSON.stringify(data, null, 2));
+}
+
+load();
+</script>
+</body>
+</html>
