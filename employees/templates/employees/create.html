@@ -9,27 +9,96 @@
   <select id="formSelect"></select>
   <form id="employeeForm"></form>
   <button id="submitBtn">Create</button>
+  <button id="newFormBtn">Create New Form</button>
+   <p>Don't have an account? <a href="{% url 'register_page' %}">Register here</a></p>
+   <a href="{% url 'login_page' %}">Login </a>
+    <a href="{% url 'employee_list' %}">  <button>Go to Employees List</button>
+    </a>
+
+
 
 <script>
-const token = localStorage.getItem('access');
+const BASE_URL = 'http://127.0.0.1:8000'; // Define base URL once
 
-async function loadForms(){
-  const res = await axios.get('/api/forms/', { headers: { Authorization: `Bearer ${token}` } });
-  const select = document.getElementById('formSelect');
-  res.data.forEach(f => {
-    const opt = document.createElement('option');
-    opt.value = f.id; opt.textContent = f.name;
-    select.appendChild(opt);
-  });
-  if(res.data.length) {
-    renderForm(res.data[0]);
+// --- Authentication and Token Refresh ---
+async function getValidAccessToken() {
+  let access = localStorage.getItem('access');
+  const refresh = localStorage.getItem('refresh');
+
+  if (!access || !refresh) {
+    alert("Please login first!");
+    window.location.href = "/accounts/login-page/";
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(atob(access.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp > now) {
+      return access; // token still valid
+    }
+  } catch (err) {
+    console.warn("Invalid token format, refreshing...");
+  }
+
+  try {
+    const res = await axios.post(`${BASE_URL}/api/accounts/token/refresh/`, {
+      refresh: refresh
+    });
+    localStorage.setItem("access", res.data.access);
+    console.log("🔁 Access token refreshed");
+    return res.data.access;
+  } catch (err) {
+    console.error("Token refresh failed:", err);
+    alert("Session expired. Please login again.");
+    localStorage.clear();
+    window.location.href = "/accounts/login-page/";
+    return null;
+  }
+}
+
+// --- Form Rendering and Loading ---
+async function loadForms() {
+  const token = await getValidAccessToken();
+  if (!token) return;
+  try {
+    const res = await axios.get('/api/forms/forms/', { 
+      headers: { Authorization: `Bearer ${token}` } 
+    });
+
+    if (!res.data || res.data.length === 0) {
+      alert('No forms found! Redirecting to form builder...');
+      window.location.href = '/dynamicforms/builder/';
+      return;
+    }
+
+    const select = document.getElementById('formSelect');
+    res.data.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      select.appendChild(opt);
+    });
+    // Render the first form by default
+    renderForm(res.data[0]); 
+  } 
+  catch (err) {
+    console.error("Error loading forms:", err);
+    if (err.response && err.response.status === 404) {
+      alert('No forms endpoint found! Redirecting to form builder...');
+      window.location.href = '/dynamicforms/builder/';
+    } else {
+      alert('Unable to load forms. Please try again later.');
+    }
   }
 }
 
 document.getElementById('formSelect').addEventListener('change', async (e) => {
   const id = e.target.value;
-  const res = await axios.get(`/api/forms/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
+  const token = await getValidAccessToken();
+  const res = await axios.get(`/api/forms/forms/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
   renderForm(res.data);
+  // Important: If in edit mode, loading a new form will clear and reset the fields.
 });
 
 function renderForm(formObj){
@@ -45,7 +114,8 @@ function renderForm(formObj){
       input.name = f.name;
     } else {
       input = document.createElement('input');
-      input.type = f.field_type === 'text' ? 'text' : f.field_type;
+      // Fix: Ensure input type is set correctly
+      input.type = f.field_type === 'text' || f.field_type === 'textarea' ? 'text' : f.field_type; 
       input.name = f.name;
     }
     if(f.required) input.required = true;
@@ -54,22 +124,118 @@ function renderForm(formObj){
   });
 }
 
-document.getElementById('submitBtn').addEventListener('click', async () => {
+// --- Unified Submit Logic ---
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  const token = await getValidAccessToken();
+  if (!token) return;
+
   const formEl = document.getElementById('employeeForm');
   const formId = formEl.getAttribute('data-form-id');
+  const urlParams = new URLSearchParams(window.location.search);
+  const employeeId = urlParams.get('employee');
+
   const data = {};
   new FormData(formEl).forEach((v, k) => data[k] = v);
+
   try {
-    await axios.post('/api/employees/', { form_id: formId, data }, { headers: { Authorization: `Bearer ${token}` } });
-    alert('Employee created');
-    // optionally redirect to list
+    if (employeeId) {
+      // EDIT MODE: Use PUT
+      await axios.put(`${BASE_URL}/api/employees/employees/${employeeId}/`,
+        { form_id: formId, data: data },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert('Employee updated ✅');
+    } else {
+      // CREATE MODE: Use POST
+      // Check for empty data object before submission (a basic check)
+      if (Object.keys(data).length === 0) {
+        alert('Form is empty. Cannot create employee.');
+        return;
+      }
+      await axios.post(`${BASE_URL}/api/employees/employees/`,
+        { form_id: formId, data: data },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert('Employee created ✅');
+    }
+    window.location.href = '/employees/';
   } catch (err) {
-    console.error(err);
-    alert('Error: ' + (err.response?.data || err.message));
+    console.error("Submit Error:", err);
+    let msg = "An unexpected error occurred.";
+    if (err.response) {
+      msg = typeof err.response.data === 'object'
+        ? JSON.stringify(err.response.data, null, 2)
+        : err.response.data;
+    } else {
+      msg = err.message;
+    }
+    alert("Error: " + msg);
+  }
+}
+
+// --- Initialization ---
+
+async function initPage() {
+  const token = await getValidAccessToken();
+  if (!token) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const employeeId = urlParams.get('employee');
+  const submitBtn = document.getElementById('submitBtn');
+  const formEl = document.getElementById('employeeForm');
+
+  // 1. Load forms first so the input elements exist
+  await loadForms();
+
+  // 2. Attach ONE submit listener
+  submitBtn.addEventListener('click', handleSubmit);
+  formEl.addEventListener('submit', handleSubmit); // Also handle Enter key press
+
+  // 3. If in Edit Mode, fetch and populate data
+  if (employeeId) {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/employees/employees/${employeeId}/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const employee = res.data;
+
+      // Ensure the correct form is selected/rendered before populating fields (important if forms were loaded)
+      const select = document.getElementById('formSelect');
+      select.value = employee.form.id;
+      // Re-render form based on the employee's assigned form if necessary (for dynamic changes)
+      // await axios.get(`/api/forms/forms/${employee.form.id}/`, { headers: { Authorization: `Bearer ${token}` } }).then(r => renderForm(r.data));
+
+
+      // Populate form fields
+      Object.keys(employee.data).forEach(key => {
+        const input = formEl.querySelector(`[name="${key}"]`);
+        if (input) input.value = employee.data[key];
+      });
+
+      // Change button text
+      submitBtn.textContent = "Update";
+
+    } catch (err) {
+      console.error("Error loading employee for edit:", err);
+      alert("Error loading employee data. Cannot edit.");
+    }
+  }
+}
+
+
+document.getElementById('newFormBtn').addEventListener('click', () => {
+  if (confirm("Do you want to create a new form?")) {
+    window.location.href = '/dynamicforms/builder/';
   }
 });
 
-loadForms();
+// Start the whole process
+initPage();
 </script>
 </body>
 </html>
+
+
+

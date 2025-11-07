@@ -21,6 +21,10 @@ from employees.views import home_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'), 
+    path('employees/', include('employees.urls')),
+    path('accounts/', include('accounts.urls')), 
+    path('dynamicforms/', include('dynamicform.urls')), 
+
     path('api/accounts/', include('accounts.urls')),
     path('api/employees/', include('employees.urls')),
     path('api/forms/', include('dynamicform.urls')),

@@ -7,3 +7,6 @@ class DynamicFormViewSet(viewsets.ModelViewSet):
     queryset = DynamicForm.objects.prefetch_related('fields').all().order_by('-id')
     serializer_class = DynamicFormSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+def builder_page(request):
+    return render(request, 'dynamicform/builder.html')

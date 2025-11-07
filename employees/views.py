@@ -25,4 +25,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 def home_view(request):
     return render(request, 'employees/list.html')
 
+def create_view(request):
+    return render(request, 'employees/create.html')
+
+
 

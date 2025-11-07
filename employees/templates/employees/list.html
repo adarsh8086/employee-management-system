@@ -1,56 +1,243 @@
-<!doctype html>
+
+
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Employees</title>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Employees</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <h2>Employees</h2>
-  <input id="q" placeholder="Search (searches values)">
-  <button id="searchBtn">Search</button>
+    <h2>Employees</h2>
+    <input id="q" placeholder="Search">
+    <button id="searchBtn">Search</button>
+     <a href="/employees/create/">
+    <button id="logoutBtn">Logout</button>
+  <button>Create Employee</button>
+</a>
+    <table border="1" id="tbl">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Form</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-  <table border="1" id="tbl">
-    <thead><tr><th>ID</th><th>Name</th><th>Form</th><th>Actions</th></tr></thead>
-    <tbody></tbody>
-  </table>
 
-<script>
-const token = localStorage.getItem('access');
+            <h2>Forms</h2>
+        <table border="1" id="formsTbl">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Slug</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+        </table>
 
-async function load(q=''){
-  const params = {};
-  if(q) params.q = q;
-  const res = await axios.get('/api/employees/', { headers: { Authorization: `Bearer ${token}` }, params });
-  const tbody = document.querySelector('#tbl tbody');
-  tbody.innerHTML = '';
-  res.data.forEach(e => {
-    const tr = document.createElement('tr');
-    const name = e.data.name || e.data.full_name || '—';
-    tr.innerHTML = `<td>${e.id}</td><td>${name}</td><td>${e.form?.name || ''}</td>
-    <td>
-      <button onclick="deleteEmployee(${e.id})">Delete</button>
-      <button onclick='viewJson(${JSON.stringify(e.data)})'>View</button>
-    </td>`;
-    tbody.appendChild(tr);
-  });
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('access');
+        const BASE_URL = 'http://127.0.0.1:8000'; // Added for clarity
+
+        async function load(q = '') {
+            if (!token) {
+                alert('Please login first!');
+                window.location.href = '/accounts/login-page/';
+                return;
+            }
+
+            try {
+                const params = {};
+                if (q) params.q = q;
+
+                const res = await axios.get(`${BASE_URL}/api/employees/employees/`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params
+                });
+
+                const data = Array.isArray(res.data) ? res.data : res.data.results;
+                const tbody = document.querySelector('#tbl tbody');
+                tbody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No records found</td></tr>';
+                    return;
+                }
+
+              
+
+
+
+                    // Around line 40:
+                  data.forEach(e => {
+                      // 💡 CHANGE 1: Encode the data for safe transfer via HTML attribute
+                      const encodedData = encodeURIComponent(JSON.stringify(e.data));
+    
+                  // Use the correct field from dynamic data
+                  const name = e.data?.full_name || e.data?.name || '—';
+                  const tr = document.createElement('tr');
+                  tr.innerHTML = `
+                      <td>${e.id}</td>
+                      <td>${name}</td>
+                      <td>${e.form?.name || '—'}</td>
+                      <td>
+                          <button onclick="window.location.href='/employees/create/?employee=${e.id}'">Edit</button>
+                          
+                          <button onclick="window.viewJson('${encodedData}')">View</button> 
+                          
+                          <button onclick="window.deleteEmployee(${e.id})">Delete</button>
+                      </td>`;
+                  tbody.appendChild(tr);
+              });
+
+             
+
+
+
+
+
+
+
+
+            }
+            //  catch (err) {
+            //     console.error("Error loading employees:", err);
+            //     alert('Error loading employees. See console for details.');
+            // }
+            catch (err) {
+                console.error(err);
+                if (err.response && err.response.status === 401) {
+                    alert('You are not logged in. Redirecting to login page...');
+                    localStorage.clear();
+                    window.location.href = '/accounts/login-page/';
+                } else {
+                    alert('Error loading employees. Check console.');
+                }
+            }
+                    }
+
+        // Attach to window so onclick handlers can access it
+        window.deleteEmployee = async function(id) {
+            if (!confirm('Delete employee?')) return;
+            try {
+                await axios.delete(`${BASE_URL}/api/employees/employees/${id}/`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                alert('Employee deleted ✅');
+                load();
+            } catch (err) {
+                console.error("Delete Error:", err);
+                alert('Error deleting employee. Check console.');
+            }
+        }
+
+
+
+
+
+
+
+
+
+      // form details
+
+          async function loadForms() {
+    const token = localStorage.getItem('access');
+    if (!token) return;
+
+    try {
+        const res = await axios.get(`${BASE_URL}/api/forms/forms/`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = Array.isArray(res.data) ? res.data : res.data.results;
+        const tbody = document.querySelector('#formsTbl tbody');
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">No forms found</td></tr>';
+            return;
+        }
+
+        data.forEach(f => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${f.id}</td>
+                <td>${f.name}</td>
+                <td>${f.slug}</td>
+                <td>
+                    <button onclick="window.editForm(${f.id})">Edit</button>
+                    <button onclick="window.deleteForm(${f.id})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Error loading forms:", err);
+        alert('Failed to load forms.');
+    }
 }
 
-document.getElementById('searchBtn').addEventListener('click', () => {
-  const q = document.getElementById('q').value;
-  load(q);
-});
-
-async function deleteEmployee(id) {
-  if(!confirm('Delete?')) return;
-  await axios.delete(`/api/employees/${id}/`, { headers: { Authorization: `Bearer ${token}` } });
-  load();
+window.deleteForm = async function(id) {
+    if (!confirm('Delete this form?')) return;
+    try {
+        await axios.delete(`${BASE_URL}/api/forms/forms/${id}/`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Form deleted ✅');
+        loadForms();
+    } catch (err) {
+        console.error("Delete Form Error:", err);
+        alert('Error deleting form. Check console.');
+    }
 }
 
-function viewJson(data){
-  alert(JSON.stringify(data, null, 2));
+window.editForm = function(id) {
+    window.location.href = `/dynamicforms/builder/?form=${id}`;
 }
 
-load();
-</script>
+loadForms();
+
+
+
+
+
+
+
+
+        // 💡 CHANGE 3: The function now expects an encoded string
+              window.viewJson = function(encodedData) {
+                  if (!encodedData) {
+                      alert("No employee data available.");
+                      return;
+                  }
+                  try {
+                      // Decode the URI component, then parse the JSON string back into an object
+                      const data = JSON.parse(decodeURIComponent(encodedData)); 
+                      alert(JSON.stringify(data, null, 2));
+                  } catch (error) {
+                      console.error("Error viewing JSON data:", error);
+                      alert("Failed to parse employee data. Check console for details.");
+                  }
+              }
+
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const q = document.getElementById('q').value;
+            load(q);
+        });
+
+        load(); // load on page load
+    });
+      // logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.clear(); // remove access and refresh tokens
+    alert('You have been logged out.');
+    window.location.href = '/accounts/login-page/';
+     });
+
+    </script>
+   
 </body>
 </html>

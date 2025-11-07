@@ -18,6 +18,8 @@
 
   <button id="addField">Add Field</button>
   <button id="saveForm">Save Form</button>
+  <button id="loginBtn">Login</button>
+
 
   <template id="fieldTpl">
     <div class="field">
@@ -36,38 +38,67 @@
     </div>
   </template>
 
+
 <script>
 const token = localStorage.getItem('access'); // JWT token
 const fieldsList = document.getElementById('fieldsList');
 const tpl = document.getElementById('fieldTpl').content;
 
+// Login button
+document.getElementById('loginBtn').addEventListener('click', () => {
+  window.location.href = '/accounts/login-page/';
+});
+
+// Add field
 document.getElementById('addField').addEventListener('click', () => {
   const node = document.importNode(tpl, true);
   node.querySelector('.remove').addEventListener('click', e => e.target.closest('.field').remove());
   fieldsList.appendChild(node);
 });
 
-// enable drag/drop
+// Enable drag/drop
 Sortable.create(fieldsList, { animation: 150 });
 
+// Save form
 document.getElementById('saveForm').addEventListener('click', async () => {
   const name = document.getElementById('formName').value;
   const slug = document.getElementById('formSlug').value;
+
   const fieldNodes = fieldsList.querySelectorAll('.field');
   const fields = Array.from(fieldNodes).map((el, index) => ({
     label: el.querySelector('.label').value,
     name: el.querySelector('.name').value,
     field_type: el.querySelector('.type').value,
-    required: el.querySelector('.required').checked,
-    order: index
-  }));
+    required: el.querySelector('.required').checked
+}));
+
+
   try {
-    const res = await axios.post('/api/forms/', {name, slug, fields}, { headers: { Authorization: `Bearer ${token}` } });
-    alert('Form saved');
-  } catch (err){
-    console.error(err); alert('Error: ' + (err.response?.data || err.message));
+    // Correct API endpoint
+    const res = await axios.post('/api/forms/forms/', { name, slug, fields }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    alert('Form saved ✅');
+    const newFormId = res.data.id;
+   window.location.href = `/employees/create/?form=${newFormId}`;
+
+
+  } catch (err) {
+    console.error(err);
+
+    // Proper error message
+    let msg;
+    if (err.response) {
+      msg = typeof err.response.data === 'object'
+        ? JSON.stringify(err.response.data, null, 2)
+        : err.response.data;
+    } else {
+      msg = err.message;
+    }
+    alert('Error: ' + msg);
   }
 });
 </script>
+
 </body>
 </html>
